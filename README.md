@@ -31,18 +31,6 @@ The script provides the following functionalities:
 
 ---
 
-## Script Details
-
-### Dependencies
-
-The script uses the following Python libraries:
-- `pandas`
-
-Install the dependencies using:
-```bash
-pip install pandas
-```
-
 ### Input File Format
 
 The input Excel file (`login_data.xlsx`) should contain the following columns:
@@ -72,71 +60,13 @@ The input Excel file (`login_data.xlsx`) should contain the following columns:
 3. **Save the processed data:**
    - Outputs the summary sheet to a new Excel file (`login_data_summary.xlsx`).
 
-### Code Walkthrough
-
-```python
-import pandas as pd
-
-def analyze_login_data(file_path):
-    """
-    Analyzes user login data and generates actionable insights.
-
-    Args:
-        file_path (str): Path to the raw data Excel file.
-
-    Returns:
-        pd.DataFrame: Summary sheet containing insights.
-    """
-    # Load the data
-    raw_data = pd.read_excel(file_path, sheet_name='raw_data')
-
-    # Ensure LOGIN_DATE is in datetime format
-    raw_data['LOGIN_DATE'] = pd.to_datetime(raw_data['LOGIN_DATE'], errors='coerce')
-
-    # Create a summary DataFrame
-    summary = raw_data.groupby('USER_CODE').agg(
-        TOTAL_LOGINS=('LOGIN_DATE', 'count'),
-        FIRST_LOGIN=('LOGIN_DATE', 'min'),
-        LAST_LOGIN=('LOGIN_DATE', 'max'),
-        AVG_TIME_DIFF=('TIME_DIFF_BETWEEN_PREV_LOGIN', 'mean'),
-        UNIQUE_DEVICES=('DEVICE_ID', lambda x: x.nunique()),
-        LOGIN_DATES=('LOGIN_DATE', lambda x: ', '.join(pd.Series(x.dropna().unique()).dt.strftime('%Y-%m-%d')))
-    ).reset_index()
-
-    # Format results
-    summary['AVG_TIME_DIFF'] = summary['AVG_TIME_DIFF'].round(2)
-
-    return summary
-
-if __name__ == "__main__":
-    # File path to the Excel file containing raw data
-    file_path = "login_data.xlsx"
-
-    # Analyze the data
-    summary_sheet = analyze_login_data(file_path)
-
-    # Save the results to a new Excel file
-    output_file = "login_data_summary.xlsx"
-    summary_sheet.to_excel(output_file, index=False)
-
-    print(f"Analysis complete! Summary saved to {output_file}")
-```
-
----
-
 ## Usage Instructions
 
 1. **Prepare the Input File:**
    - Ensure the input file (`login_data.xlsx`) is in the same directory as the script.
    - The file should have a sheet named `raw_data` with the required columns.
 
-2. **Run the Script:**
-   Execute the script using:
-   ```bash
-   python login_data_analysis.py
-   ```
-
-3. **Output File:**
+2. **Output File:**
    - The script will generate a new file named `login_data_summary.xlsx` in the same directory.
    - This file will contain the processed summary sheet with insights.
 
